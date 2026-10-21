@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body, html {
+            margin: 0; padding: 0; overflow: hidden; height: 100%;
+            background: transparent;
+        }
+        #ui-panel {
+            position: absolute; right: 20px; top: 20px; z-index: 100;
+            font-family: 'Segoe UI', sans-serif;
+            background: rgba(15,15,15,0.95); padding: 10px;
+            border-radius: 12px; width: 260px; color: white;
+            border: 1px solid #333;
+            display: flex; flex-direction: column;
+            max-height: 90vh;
+        }
+        .tabs {
+            display: flex; gap: 4px; margin-bottom: 10px;
+        }
+        .tab-btn {
+            flex: 1; padding: 8px 0; background: #2c3e50; border: none;
+            color: #ccc; cursor: pointer; border-radius: 6px;
+            font-weight: bold; font-size: 11px; transition: 0.2s;
+        }
+        .tab-btn.active {
+            background: #3498db; color: white;
+        }
+        .tab-content {
+            display: none; overflow-y: auto; flex: 1;
+            padding-right: 2px;
+        }
+        .tab-content.active { display: block; }
+
+        /* Гардероб */
+        .skin-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .skin-thumb {
+            width: 100%; aspect-ratio: 1/1;
+            border-radius: 6px; cursor: pointer;
+            border: 2px solid transparent;
+            object-fit: cover; background: #222;
+            transition: border-color 0.2s;
+        }
+        .skin-thumb:hover { border-color: #f39c12; }
+
+        /* Анимации */
+        #poses-container {
+            display: flex; flex-direction: column; gap: 5px;
+            margin-top: 8px;
+        }
+        .pose-btn {
+            background: #3498db; color: white; border: none;
+            padding: 8px; cursor: pointer; border-radius: 5px;
+            font-weight: bold; text-transform: uppercase; font-size: 10px;
+        }
+        #pose-search {
+            background: #222; border: 1px solid #444; color: white;
+            padding: 8px; border-radius: 6px; font-size: 12px;
+            outline: none; width: 100%; box-sizing: border-box;
+        }
+
+        /* Фон */
+        .bg-group { display: flex; gap: 4px; margin-top: 8px; }
+        .bg-btn {
+            flex: 1; padding: 6px 2px; cursor: pointer; border: none;
+            border-radius: 4px; font-size: 9px; color: white; font-weight: bold;
+        }
+
+        /* Общие кнопки */
+        .skin-btn {
+            background: #f39c12; border: none; color: white;
+            padding: 10px; cursor: pointer; border-radius: 6px;
+            font-weight: bold; margin-top: 8px; width: 100%;
+        }
+        .exit-btn {
+            background: #e74c3c; border: none; color: white;
+            padding: 8px; cursor: pointer; border-radius: 5px;
+            margin-top: 10px; width: 100%;
+        }
+
+        #input-video { display: none; }
+        #canvas-container { width: 100vw; height: 100vh; }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+    </style>
+</head>
+<body>
+    <video id="input-video" autoplay playsinline></video>
+
+    <div id="ui-panel">
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="wardrobe">Гардероб</button>
+            <button class="tab-btn" data-tab="poses">Анимации</button>
+            <button class="tab-btn" data-tab="background">Фон</button>
+        </div>
+
+        <div id="tab-wardrobe" class="tab-content active">
+            <div class="skin-grid" id="skin-grid"></div>
+            <button class="skin-btn" onclick="document.getElementById('skin-upload').click()">
+                ЗАГРУЗИТЬ СВОЙ СКИН
+            </button>
+            <input type="file" id="skin-upload" style="display:none" accept="image/png"
+                   onchange="window.changeSkinFromFile(this)">
+        </div>
+
+        <div id="tab-poses" class="tab-content">
+            <input type="text" id="pose-search" placeholder="Поиск анимации..."
+                   oninput="window.filterPoses(this.value)">
+            <div id="poses-container"></div>
+        </div>
+
+        <div id="tab-background" class="tab-content">
+            <div class="bg-group">
+                <button class="bg-btn" style="background:#2ecc71"
+                        onclick="window.setBG('#00ff00')">GREEN</button>
+                <button class="bg-btn" style="background:#333"
+                        onclick="window.setBG('#1a1a1a')">DARK</button>
+                <button class="bg-btn" style="background:#555"
+                        onclick="window.setBG('transparent')">OFF</button>
+            </div>
+            <button class="skin-btn" style="background:#9b59b6; margin-top:8px"
+                    onclick="document.getElementById('bg-upload').click()">
+                СВОЙ ФОН
+            </button>
+            <input type="file" id="bg-upload" style="display:none" accept="image/*"
+                   onchange="window.changeCustomBG(this)">
+        </div>
+
+        <button class="exit-btn" onclick="window.close()">ВЫХОД</button>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>
